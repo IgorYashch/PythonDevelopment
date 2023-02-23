@@ -1,4 +1,7 @@
 import random
+import sys
+import os
+from urllib import request
 from collections import Counter
 
 
@@ -35,3 +38,35 @@ def ask(prompt, valid=None):
 def inform(format_string, bulls, cows):
     print(format_string.format(bulls, cows))
 
+
+def main():
+    if len(sys.argv) not in {2, 3}:
+        raise SyntaxError("Wrong format of args")
+
+    dct_address = sys.argv[1]
+    file = None
+    if os.path.exists(dct_address):
+        file = open(dct_address, "r")
+    else:
+        file = [word.decode() for word in request.urlopen(dct_address)]
+        if not file:
+            raise ValueError("No such file")
+
+    words_len = 5
+    if len(sys.argv) == 3:
+        try:
+            words_len = int(sys.argv[2])
+        except ValueError:
+            raise ValueError("Wrong format of length of words")
+
+    dct = [
+        stripped_word
+        for word in file
+        if len(stripped_word := word.strip()) == words_len
+    ]
+
+    gameplay(ask, inform, dct)
+
+
+if __name__ == "__main__":
+    main()
