@@ -1,8 +1,14 @@
 import random
 import sys
 import os
+import cowsay
 from urllib import request
 from collections import Counter
+
+
+def string_by_cow(s):
+    cow = random.choice(cowsay.list_cows())
+    return cowsay.cowsay(s, cow=cow)
 
 
 def bullscows(guess, secret):
@@ -29,14 +35,14 @@ def gameplay(ask, inform, words):
 
 def ask(prompt, valid=None):
     while True:
-        guess = input(prompt).strip()
+        guess = input(string_by_cow(prompt) + '\n').strip()
         if not valid or guess in valid:
             break
     return guess
 
 
 def inform(format_string, bulls, cows):
-    print(format_string.format(bulls, cows))
+    print(string_by_cow(format_string.format(bulls, cows)))
 
 
 def main():
