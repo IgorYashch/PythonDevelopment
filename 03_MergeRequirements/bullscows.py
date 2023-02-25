@@ -6,10 +6,13 @@ from urllib import request
 from collections import Counter
 
 
-def string_by_cow(s):
-    cow = random.choice(cowsay.list_cows())
+def by_random_cow(s):
+    cow = cowsay.get_random_cow()
     return cowsay.cowsay(s, cow=cow)
 
+def by_my_cow(s):
+    cow = cowsay.read_dot_cow(open("./my_cow.cow"))
+    return cowsay.cowsay(s, cowfile=cow)
 
 def bullscows(guess, secret):
     bulls = sum(x == y for x, y in zip(guess, secret))
@@ -35,14 +38,14 @@ def gameplay(ask, inform, words):
 
 def ask(prompt, valid=None):
     while True:
-        guess = input(string_by_cow(prompt) + '\n').strip()
+        guess = input(by_my_cow(prompt) + '\n').strip()
         if not valid or guess in valid:
             break
     return guess
 
 
 def inform(format_string, bulls, cows):
-    print(string_by_cow(format_string.format(bulls, cows)))
+    print(by_random_cow(format_string.format(bulls, cows)))
 
 
 def main():
@@ -75,4 +78,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except EOFError:
+        exit()
