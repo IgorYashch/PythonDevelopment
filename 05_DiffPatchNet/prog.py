@@ -56,7 +56,7 @@ async def chat(reader, writer):
                                 await clients[to][1].put(cowsay(msg, cow=login))
                     elif result.startswith('yield'):
                         _, msg = result.split(maxsplit=1)
-                        for cow, qeueu in clients.values():
+                        for cow, queue in clients.values():
                             if login != cow:
                                 await queue.put(cowsay(msg, cow=login))
                 else:
