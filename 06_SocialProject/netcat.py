@@ -4,6 +4,7 @@ import readline
 import socket
 import time
 
+
 class NetcatCmd(cmd.Cmd):
     def __init__(self, server_ip, server_port):
         super().__init__()
@@ -25,7 +26,9 @@ class NetcatCmd(cmd.Cmd):
                 self.last_message = None
             elif code == '1':
                 self.last_message = msg
-            
+            elif code == '2':
+                print(f"{msg}", flush=True)
+                return
 
     def do_who(self, _):
         self.sock.sendall(b"who\n")
@@ -51,7 +54,8 @@ class NetcatCmd(cmd.Cmd):
         self.sock.sendall(b"cows complete\n")
         while self.last_message is None:
             time.sleep(0.1)
-        cows = self.last_message.split()    
+        cows = self.last_message.split()
+        self.last_message = None
         return [cow for cow in cows if cow.startswith(text)]
 
     def complete_say(self, text, line, begidx, endidx):
@@ -59,7 +63,9 @@ class NetcatCmd(cmd.Cmd):
         while self.last_message is None:
             time.sleep(0.1)
         users = self.last_message.split()
+        self.last_message = None
         return [user for user in users if user.startswith(text)]
+
 
 if __name__ == '__main__':
     server_ip = '0.0.0.0'

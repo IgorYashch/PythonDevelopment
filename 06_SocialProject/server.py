@@ -28,6 +28,7 @@ async def chat(reader, writer):
 
                 if result == "quit":
                     quit = True
+                    writer.write(f"2Goodbye!".encode())
                     break
 
                 elif result == "cows":
@@ -37,7 +38,7 @@ async def chat(reader, writer):
                         f"0Available cows: {', '.join(available_cows)}"
                     )
 
-                elif result ==  "cows complete":
+                elif result == "cows complete":
                     used_cows = set(cow for cow, _ in clients.values() if cow)
                     available_cows = set(list_cows()) - used_cows
                     await clients[me][1].put(f"1{' '.join(available_cows)}")
