@@ -11,9 +11,12 @@ class NetcatCmd(cmd.Cmd):
         self.server_ip = server_ip
         self.server_port = server_port
         self.prompt = "netcat> "
+        
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock.connect((self.server_ip, self.server_port))
         self.print_thread = threading.Thread(target=self.print_from_server)
+        self.complete_block_event = threading.Event()
+        
+        self.sock.connect((self.server_ip, self.server_port))
         self.print_thread.start()
         self.last_message = None
 
@@ -26,6 +29,7 @@ class NetcatCmd(cmd.Cmd):
                 self.last_message = None
             elif code == '1':
                 self.last_message = msg
+                self.complete_block_event.set()
             elif code == '2':
                 print(f"{msg}", flush=True)
                 return
@@ -52,18 +56,22 @@ class NetcatCmd(cmd.Cmd):
 
     def complete_login(self, text, line, begidx, endidx):
         self.sock.sendall(b"cows complete\n")
-        while self.last_message is None:
-            time.sleep(0.1)
+        self.complete_block_event.wait()
+        
         cows = self.last_message.split()
         self.last_message = None
+        
+        self.complete_block_event.clear()
         return [cow for cow in cows if cow.startswith(text)]
 
     def complete_say(self, text, line, begidx, endidx):
         self.sock.sendall(b"who complete\n")
-        while self.last_message is None:
-            time.sleep(0.1)
+        self.complete_block_event.wait()
+        
         users = self.last_message.split()
         self.last_message = None
+        
+        self.complete_block_event.clear()
         return [user for user in users if user.startswith(text)]
 
 
